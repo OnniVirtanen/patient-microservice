@@ -26,18 +26,18 @@ public class EmergencyContactEntity {
     @Column(name = "phone_number", nullable = false)
     private String phoneNumber;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "relationship", nullable = false)
-    private Enum<RelationshipEnum> relationship;
+    private RelationshipEnum relationship;
 
     @Column(name = "social_security_number", nullable = false)
     private String SSN;
 
-    @OneToMany(cascade = CascadeType.ALL)
-    @JoinColumn(name = "address_id")
+    @OneToMany(mappedBy = "emergencyContact", cascade = CascadeType.ALL)
     private List<AddressEntity> addresses;
 
     public EmergencyContactEntity(UUID id, String firstName, String secondName, String lastName, String phoneNumber,
-                                  Enum<RelationshipEnum> relationship, String SSN, List<AddressEntity> addresses) {
+                                  RelationshipEnum relationship, String SSN, List<AddressEntity> addresses) {
         this.id = id;
         this.firstName = firstName;
         this.secondName = secondName;
@@ -92,11 +92,11 @@ public class EmergencyContactEntity {
         this.phoneNumber = phoneNumber;
     }
 
-    public Enum<RelationshipEnum> getRelationship() {
+    public RelationshipEnum getRelationship() {
         return relationship;
     }
 
-    public void setRelationship(Enum<RelationshipEnum> relationship) {
+    public void setRelationship(RelationshipEnum relationship) {
         this.relationship = relationship;
     }
 

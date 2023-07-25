@@ -18,8 +18,9 @@ public class PatientEntity {
     @Column(name = "social_security_number", nullable = false)
     private String SSN;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "gender", nullable = false)
-    private Enum<GenderEnum> gender;
+    private GenderEnum gender;
 
     @Column(name = "first_name", nullable = false)
     private String firstName;
@@ -33,11 +34,10 @@ public class PatientEntity {
     @Column(name = "date_of_birth", nullable = false)
     private LocalDate dateOfBirth;
 
-    @OneToMany(cascade = CascadeType.ALL)
-    @JoinColumn(name = "address_id")
+    @OneToMany(mappedBy = "patient", cascade = CascadeType.ALL)
     private List<AddressEntity> addresses;
 
-    public PatientEntity(UUID id, String SSN, Enum<GenderEnum> gender, String firstName, String secondName,
+    public PatientEntity(UUID id, String SSN, GenderEnum gender, String firstName, String secondName,
                          String lastName, LocalDate dateOfBirth, List<AddressEntity> addresses) {
         this.id = id;
         this.SSN = SSN;
@@ -69,11 +69,11 @@ public class PatientEntity {
         this.SSN = SSN;
     }
 
-    public Enum<GenderEnum> getGender() {
+    public GenderEnum getGender() {
         return gender;
     }
 
-    public void setGender(Enum<GenderEnum> gender) {
+    public void setGender(GenderEnum gender) {
         this.gender = gender;
     }
 
