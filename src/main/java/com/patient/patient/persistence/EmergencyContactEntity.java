@@ -36,8 +36,13 @@ public class EmergencyContactEntity {
     @OneToMany(mappedBy = "emergencyContact", cascade = CascadeType.ALL)
     private List<AddressEntity> addresses;
 
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "patient_id", nullable = true)
+    private PatientEntity patient;
+
     public EmergencyContactEntity(UUID id, String firstName, String secondName, String lastName, String phoneNumber,
-                                  RelationshipEnum relationship, String SSN, List<AddressEntity> addresses) {
+                                  RelationshipEnum relationship, String SSN, List<AddressEntity> addresses,
+                                  PatientEntity patient) {
         this.id = id;
         this.firstName = firstName;
         this.secondName = secondName;
@@ -46,10 +51,19 @@ public class EmergencyContactEntity {
         this.relationship = relationship;
         this.SSN = SSN;
         this.addresses = addresses;
+        this.patient = patient;
     }
 
     public EmergencyContactEntity() {
 
+    }
+
+    public PatientEntity getPatient() {
+        return patient;
+    }
+
+    public void setPatient(PatientEntity patient) {
+        this.patient = patient;
     }
 
     public UUID getId() {
@@ -124,11 +138,12 @@ public class EmergencyContactEntity {
         return Objects.equals(id, that.id) && Objects.equals(firstName, that.firstName)
                 && Objects.equals(secondName, that.secondName) && Objects.equals(lastName, that.lastName)
                 && Objects.equals(phoneNumber, that.phoneNumber) && Objects.equals(relationship, that.relationship)
-                && Objects.equals(SSN, that.SSN) && Objects.equals(addresses, that.addresses);
+                && Objects.equals(SSN, that.SSN) && Objects.equals(addresses, that.addresses)
+                && Objects.equals(patient, that.patient);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, firstName, secondName, lastName, phoneNumber, relationship, SSN, addresses);
+        return Objects.hash(id, firstName, secondName, lastName, phoneNumber, relationship, SSN, addresses, patient);
     }
 }

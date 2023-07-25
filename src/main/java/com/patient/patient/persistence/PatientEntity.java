@@ -37,8 +37,12 @@ public class PatientEntity {
     @OneToMany(mappedBy = "patient", cascade = CascadeType.ALL)
     private List<AddressEntity> addresses;
 
+    @OneToMany(mappedBy = "patient", cascade = CascadeType.ALL)
+    private List<EmergencyContactEntity> emergencyContactEntities;
+
     public PatientEntity(UUID id, String SSN, GenderEnum gender, String firstName, String secondName,
-                         String lastName, LocalDate dateOfBirth, List<AddressEntity> addresses) {
+                         String lastName, LocalDate dateOfBirth, List<AddressEntity> addresses,
+                         List<EmergencyContactEntity> emergencyContactEntities) {
         this.id = id;
         this.SSN = SSN;
         this.gender = gender;
@@ -47,10 +51,19 @@ public class PatientEntity {
         this.lastName = lastName;
         this.dateOfBirth = dateOfBirth;
         this.addresses = addresses;
+        this.emergencyContactEntities = emergencyContactEntities;
     }
 
     public PatientEntity() {
 
+    }
+
+    public List<EmergencyContactEntity> getEmergencyContactEntities() {
+        return emergencyContactEntities;
+    }
+
+    public void setEmergencyContactEntities(List<EmergencyContactEntity> emergencyContactEntities) {
+        this.emergencyContactEntities = emergencyContactEntities;
     }
 
     public UUID getId() {
@@ -125,11 +138,13 @@ public class PatientEntity {
         return Objects.equals(id, that.id) && Objects.equals(SSN, that.SSN) && Objects.equals(gender, that.gender)
                 && Objects.equals(firstName, that.firstName) && Objects.equals(secondName, that.secondName)
                 && Objects.equals(lastName, that.lastName) && Objects.equals(dateOfBirth, that.dateOfBirth)
-                && Objects.equals(addresses, that.addresses);
+                && Objects.equals(addresses, that.addresses)
+                && Objects.equals(emergencyContactEntities, that.emergencyContactEntities);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, SSN, gender, firstName, secondName, lastName, dateOfBirth, addresses);
+        return Objects.hash(id, SSN, gender, firstName, secondName, lastName, dateOfBirth, addresses,
+                emergencyContactEntities);
     }
 }
