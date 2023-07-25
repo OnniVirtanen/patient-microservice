@@ -1,0 +1,25 @@
+version: '3'
+
+services:
+  patient-service:
+    image: 'patient-service:latest'
+    build:
+      context: .
+    container_name: patient-service
+    depends_on:
+      - db
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/postgres
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=postgres
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=create-drop
+    ports:
+      - "8080:8080"
+  db:
+    image: 'postgres:13.1-alpine'
+    container_name: db
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    ports:
+      - "5332:5432"
