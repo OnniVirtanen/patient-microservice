@@ -1,11 +1,13 @@
 package com.patient.patient.persistence;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.patient.patient.model.GenderEnum;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.UUID;
 
 @Entity(name = "Patient")
@@ -34,14 +36,19 @@ public class PatientEntity {
     @Column(name = "date_of_birth", nullable = false)
     private LocalDate dateOfBirth;
 
-    @OneToMany(mappedBy = "patient", cascade = CascadeType.ALL)
-    private List<AddressEntity> addresses;
+    @ManyToMany(cascade = CascadeType.ALL)
+    @JoinTable(
+            name = "patient_address",
+            joinColumns = @JoinColumn(name = "patient_id"),
+            inverseJoinColumns = @JoinColumn(name = "address_id")
+    )
+    private Set<AddressEntity> addresses;
 
     @OneToMany(mappedBy = "patient", cascade = CascadeType.ALL)
     private List<EmergencyContactEntity> emergencyContactEntities;
 
     public PatientEntity(UUID id, String SSN, GenderEnum gender, String firstName, String secondName,
-                         String lastName, LocalDate dateOfBirth, List<AddressEntity> addresses,
+                         String lastName, LocalDate dateOfBirth, Set<AddressEntity> addresses,
                          List<EmergencyContactEntity> emergencyContactEntities) {
         this.id = id;
         this.SSN = SSN;
@@ -122,11 +129,11 @@ public class PatientEntity {
         this.dateOfBirth = dateOfBirth;
     }
 
-    public List<AddressEntity> getAddresses() {
+    public Set<AddressEntity> getAddresses() {
         return addresses;
     }
 
-    public void setAddresses(List<AddressEntity> addresses) {
+    public void setAddresses(Set<AddressEntity> addresses) {
         this.addresses = addresses;
     }
 

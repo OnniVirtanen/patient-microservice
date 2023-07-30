@@ -1,8 +1,10 @@
 package com.patient.patient.persistence;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 
 import java.util.Objects;
+import java.util.Set;
 import java.util.UUID;
 
 @Entity(name = "address")
@@ -30,16 +32,15 @@ public class AddressEntity {
     @Column(name = "primary_address", nullable = false)
     private Boolean primaryAddress;
 
-    @ManyToOne
-    @JoinColumn(name = "emergency_contact_id", nullable = true)
-    private EmergencyContactEntity emergencyContact;
+    @ManyToMany(mappedBy = "addresses", cascade = CascadeType.ALL)
+    private Set<EmergencyContactEntity> emergencyContacts;
 
-    @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "patient_id", nullable = true)
-    private PatientEntity patient;
+    @ManyToMany(mappedBy = "addresses", cascade = CascadeType.ALL)
+    private Set<PatientEntity> patients;
 
     public AddressEntity(UUID id, String street, String city, String state, String postalCode, String country,
-                         Boolean primaryAddress, EmergencyContactEntity emergencyContact, PatientEntity patient) {
+                         Boolean primaryAddress, Set<EmergencyContactEntity> emergencyContacts,
+                         Set<PatientEntity> patients) {
         this.id = id;
         this.street = street;
         this.city = city;
@@ -47,8 +48,8 @@ public class AddressEntity {
         this.postalCode = postalCode;
         this.country = country;
         this.primaryAddress = primaryAddress;
-        this.emergencyContact = emergencyContact;
-        this.patient = patient;
+        this.emergencyContacts = emergencyContacts;
+        this.patients = patients;
     }
 
     public AddressEntity() {
@@ -111,20 +112,20 @@ public class AddressEntity {
         this.primaryAddress = primaryAddress;
     }
 
-    public EmergencyContactEntity getEmergencyContact() {
-        return emergencyContact;
+    public Set<EmergencyContactEntity> getEmergencyContacts() {
+        return emergencyContacts;
     }
 
-    public void setEmergencyContact(EmergencyContactEntity emergencyContact) {
-        this.emergencyContact = emergencyContact;
+    public void setEmergencyContact(Set<EmergencyContactEntity> emergencyContacts) {
+        this.emergencyContacts = emergencyContacts;
     }
 
-    public PatientEntity getPatient() {
-        return patient;
+    public Set<PatientEntity> getPatients() {
+        return patients;
     }
 
-    public void setPatient(PatientEntity patient) {
-        this.patient = patient;
+    public void setPatients(Set<PatientEntity> patients) {
+        this.patients = patients;
     }
 
     @Override
@@ -135,11 +136,11 @@ public class AddressEntity {
         return Objects.equals(id, that.id) && Objects.equals(street, that.street) && Objects.equals(city, that.city)
                 && Objects.equals(state, that.state) && Objects.equals(postalCode, that.postalCode)
                 && Objects.equals(country, that.country) && Objects.equals(primaryAddress, that.primaryAddress)
-                && Objects.equals(emergencyContact, that.emergencyContact) && Objects.equals(patient, that.patient);
+                && Objects.equals(emergencyContacts, that.emergencyContacts) && Objects.equals(patients, that.patients);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, street, city, state, postalCode, country, primaryAddress, emergencyContact, patient);
+        return Objects.hash(id, street, city, state, postalCode, country, primaryAddress, emergencyContacts, patients);
     }
 }

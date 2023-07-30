@@ -15,13 +15,12 @@ public class PatientDTOMapper implements Function<PatientEntity, PatientDTO>
     public PatientDTO apply(PatientEntity patientEntity)
     {
         return new PatientDTO(
+            patientEntity.getId(),
             patientEntity.getGender(),
             patientEntity.getFirstName(),
             patientEntity.getSecondName(),
-                patientEntity.getLastName(),
-                patientEntity.getDateOfBirth(),
-                patientEntity.getAddresses(),
-                patientEntity.getEmergencyContactEntities()
+            patientEntity.getLastName(),
+            patientEntity.getDateOfBirth()
         );
     }
 
