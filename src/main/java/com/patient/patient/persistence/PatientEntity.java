@@ -1,7 +1,7 @@
 package com.patient.patient.persistence;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.patient.patient.model.GenderEnum;
+import com.patient.patient.model.NewPatientRequest;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
@@ -59,6 +59,15 @@ public class PatientEntity {
         this.dateOfBirth = dateOfBirth;
         this.addresses = addresses;
         this.emergencyContactEntities = emergencyContactEntities;
+    }
+
+    public PatientEntity(NewPatientRequest request) {
+        this.setFirstName(request.firstName());
+        this.setSecondName(request.secondName());
+        this.setLastName(request.lastName());
+        this.setGender(request.gender());
+        this.setSSN(request.SSN());
+        this.setDateOfBirth(request.dateOfBirth());
     }
 
     public PatientEntity() {

@@ -1,15 +1,14 @@
 package com.patient.patient.model;
 
+
 import java.time.LocalDate;
-import java.util.UUID;
 
-
-public record PatientDTO(
-        UUID id,
-        GenderEnum gender,
+public record NewPatientRequest(
         String firstName,
         String secondName,
         String lastName,
+        GenderEnum gender,
+        String SSN,
         LocalDate dateOfBirth
 ) {
 }
