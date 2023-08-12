@@ -32,10 +32,18 @@ public class AddressEntity {
     @Column(name = "primary_address", nullable = false)
     private Boolean primaryAddress;
 
-    @ManyToMany(mappedBy = "addresses", cascade = CascadeType.ALL)
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @JoinTable(name = "emergency_contact_address",
+            joinColumns = @JoinColumn(name = "address_id"),
+            inverseJoinColumns = @JoinColumn(name = "emergency_contact_id")
+    )
     private Set<EmergencyContactEntity> emergencyContacts;
 
-    @ManyToMany(mappedBy = "addresses", cascade = CascadeType.ALL)
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @JoinTable(name = "patient_address",
+            joinColumns = @JoinColumn(name = "address_id"),
+            inverseJoinColumns = @JoinColumn(name = "patient_id")
+    )
     private Set<PatientEntity> patients;
 
     public AddressEntity(UUID id, String street, String city, String state, String postalCode, String country,
@@ -52,8 +60,11 @@ public class AddressEntity {
         this.patients = patients;
     }
 
-    public AddressEntity() {
+    public AddressEntity() {}
 
+    public void removePatient(PatientEntity patient) {
+        this.patients.remove(patient);
+        patient.getAddresses().remove(this);
     }
 
     public UUID getId() {

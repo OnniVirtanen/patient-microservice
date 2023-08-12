@@ -35,12 +35,7 @@ public class EmergencyContactEntity {
     @Column(name = "social_security_number", nullable = false)
     private String SSN;
 
-    @ManyToMany(cascade = CascadeType.ALL)
-    @JoinTable(
-            name = "emergency_contact_address",
-            joinColumns = @JoinColumn(name = "emergency_contact_id"),
-            inverseJoinColumns = @JoinColumn(name = "address_id")
-    )
+    @ManyToMany(mappedBy = "emergencyContacts")
     private Set<AddressEntity> addresses;
 
     @ManyToOne(cascade = CascadeType.ALL)

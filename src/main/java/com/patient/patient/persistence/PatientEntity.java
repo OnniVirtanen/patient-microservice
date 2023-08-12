@@ -36,12 +36,7 @@ public class PatientEntity {
     @Column(name = "date_of_birth", nullable = false)
     private LocalDate dateOfBirth;
 
-    @ManyToMany(cascade = CascadeType.ALL)
-    @JoinTable(
-            name = "patient_address",
-            joinColumns = @JoinColumn(name = "patient_id"),
-            inverseJoinColumns = @JoinColumn(name = "address_id")
-    )
+    @ManyToMany(mappedBy = "patients")
     private Set<AddressEntity> addresses;
 
     @OneToMany(mappedBy = "patient", cascade = CascadeType.ALL)
@@ -70,8 +65,11 @@ public class PatientEntity {
         this.setDateOfBirth(request.dateOfBirth());
     }
 
-    public PatientEntity() {
+    public PatientEntity() {}
 
+    public void removeAddress(AddressEntity address) {
+        this.addresses.remove(address);
+        address.getPatients().remove(this);
     }
 
     public List<EmergencyContactEntity> getEmergencyContactEntities() {

@@ -20,7 +20,8 @@ public class PatientDTOMapper implements Function<PatientEntity, PatientDTO>
             patientEntity.getFirstName(),
             patientEntity.getSecondName(),
             patientEntity.getLastName(),
-            patientEntity.getDateOfBirth()
+            patientEntity.getDateOfBirth(),
+            patientEntity.getSSN()
         );
     }
 

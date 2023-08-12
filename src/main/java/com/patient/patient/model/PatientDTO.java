@@ -10,6 +10,7 @@ public record PatientDTO(
         String firstName,
         String secondName,
         String lastName,
-        LocalDate dateOfBirth
+        LocalDate dateOfBirth,
+        String SSN
 ) {
 }
