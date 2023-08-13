@@ -1,6 +1,7 @@
 package com.patient.patient.controller;
 
 import com.patient.patient.exception.PatientServiceException;
+import com.patient.patient.model.GenderEnum;
 import com.patient.patient.model.NewPatientRequest;
 import com.patient.patient.model.PatientDTO;
 import com.patient.patient.persistence.PatientEntity;
@@ -15,6 +16,7 @@ import org.springframework.lang.NonNull;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
@@ -51,7 +53,6 @@ public class PatientController {
         }
     }
 
-    // update
     @PutMapping(path = "/patient/{patientID}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> updatePatient(final @PathVariable("patientID") UUID id,
                                                 final @Valid @RequestBody NewPatientRequest request) {
@@ -63,7 +64,6 @@ public class PatientController {
         }
     }
 
-    // delete
     @DeleteMapping(path = "/patient/{patientID}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> removePatient(final @PathVariable("patientID") UUID id) {
         try {

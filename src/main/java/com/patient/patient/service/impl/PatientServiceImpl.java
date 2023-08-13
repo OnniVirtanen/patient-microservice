@@ -89,13 +89,6 @@ public class PatientServiceImpl implements PatientService {
         final Optional<PatientEntity> optionalPatient = patientRepository.findById(id);
 
         if (optionalPatient.isPresent()) {
-            final PatientEntity patient = optionalPatient.get();
-            // remove association between the patient and its addresses
-            Set<AddressEntity> addresses = patient.getAddresses();
-            for (AddressEntity address : addresses) {
-                patient.removeAddress(address);
-            }
-
             patientRepository.deleteById(id);
             return ResponseEntity.ok().build();
         }

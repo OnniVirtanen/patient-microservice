@@ -7,7 +7,7 @@ mvn clean install
 docker build -t patient-service .
 
 # Stop and remove existing containers
-##docker-compose-down
+docker compose down
 
 # Start the application using Docker Compose
-docker-compose up
+docker compose up 

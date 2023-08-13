@@ -35,16 +35,19 @@ public class EmergencyContactEntity {
     @Column(name = "social_security_number", nullable = false)
     private String SSN;
 
-    @ManyToMany(mappedBy = "emergencyContacts")
+    @ManyToMany
+    @JoinTable(
+            name = "emergency_contact_address",
+            joinColumns = @JoinColumn(name = "emergency_contact_id"),
+            inverseJoinColumns = @JoinColumn(name = "address_id"))
     private Set<AddressEntity> addresses;
 
-    @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "patient_id", nullable = true)
-    private PatientEntity patient;
+    @ManyToMany(mappedBy = "emergencyContactEntities")
+    private Set<PatientEntity> patients;
 
     public EmergencyContactEntity(UUID id, String firstName, String secondName, String lastName, String phoneNumber,
                                   RelationshipEnum relationship, String SSN, Set<AddressEntity> addresses,
-                                  PatientEntity patient) {
+                                  Set<PatientEntity> patients) {
         this.id = id;
         this.firstName = firstName;
         this.secondName = secondName;
@@ -53,19 +56,19 @@ public class EmergencyContactEntity {
         this.relationship = relationship;
         this.SSN = SSN;
         this.addresses = addresses;
-        this.patient = patient;
+        this.patients = patients;
     }
 
     public EmergencyContactEntity() {
 
     }
 
-    public PatientEntity getPatient() {
-        return patient;
+    public Set<PatientEntity> getPatients() {
+        return patients;
     }
 
-    public void setPatient(PatientEntity patient) {
-        this.patient = patient;
+    public void setPatients(Set<PatientEntity> patients) {
+        this.patients = patients;
     }
 
     public UUID getId() {
@@ -141,11 +144,11 @@ public class EmergencyContactEntity {
                 && Objects.equals(secondName, that.secondName) && Objects.equals(lastName, that.lastName)
                 && Objects.equals(phoneNumber, that.phoneNumber) && Objects.equals(relationship, that.relationship)
                 && Objects.equals(SSN, that.SSN) && Objects.equals(addresses, that.addresses)
-                && Objects.equals(patient, that.patient);
+                && Objects.equals(patients, that.patients);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, firstName, secondName, lastName, phoneNumber, relationship, SSN, addresses, patient);
+        return Objects.hash(id, firstName, secondName, lastName, phoneNumber, relationship, SSN, addresses, patients);
     }
 }

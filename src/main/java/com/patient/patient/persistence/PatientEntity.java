@@ -36,15 +36,23 @@ public class PatientEntity {
     @Column(name = "date_of_birth", nullable = false)
     private LocalDate dateOfBirth;
 
-    @ManyToMany(mappedBy = "patients")
+    @ManyToMany
+    @JoinTable(
+            name = "patient_address",
+            joinColumns = @JoinColumn(name = "patient_id"),
+            inverseJoinColumns = @JoinColumn(name = "address_id"))
     private Set<AddressEntity> addresses;
 
-    @OneToMany(mappedBy = "patient", cascade = CascadeType.ALL)
-    private List<EmergencyContactEntity> emergencyContactEntities;
+    @ManyToMany
+    @JoinTable(
+            name = "patient_emergency_contact",
+            joinColumns = @JoinColumn(name = "patient_id"),
+            inverseJoinColumns = @JoinColumn(name = "emergency_contact_id"))
+    private Set<EmergencyContactEntity> emergencyContactEntities;
 
     public PatientEntity(UUID id, String SSN, GenderEnum gender, String firstName, String secondName,
                          String lastName, LocalDate dateOfBirth, Set<AddressEntity> addresses,
-                         List<EmergencyContactEntity> emergencyContactEntities) {
+                         Set<EmergencyContactEntity> emergencyContactEntities) {
         this.id = id;
         this.SSN = SSN;
         this.gender = gender;
@@ -72,11 +80,11 @@ public class PatientEntity {
         address.getPatients().remove(this);
     }
 
-    public List<EmergencyContactEntity> getEmergencyContactEntities() {
+    public Set<EmergencyContactEntity> getEmergencyContactEntities() {
         return emergencyContactEntities;
     }
 
-    public void setEmergencyContactEntities(List<EmergencyContactEntity> emergencyContactEntities) {
+    public void setEmergencyContactEntities(Set<EmergencyContactEntity> emergencyContactEntities) {
         this.emergencyContactEntities = emergencyContactEntities;
     }
 
