@@ -22,13 +22,10 @@ public class PatientServiceImpl implements PatientService {
 
     private final Logger logger = LoggerFactory.getLogger(PatientServiceImpl.class);
     private final PatientRepository patientRepository;
-    private final AddressRepository addressRepository;
     private final PatientDTOMapper patientDTOMapper;
 
-    public PatientServiceImpl(PatientRepository patientRepository, AddressRepository addressRepository,
-                              PatientDTOMapper patientDTOMapper) {
+    public PatientServiceImpl(PatientRepository patientRepository, PatientDTOMapper patientDTOMapper) {
         this.patientRepository = patientRepository;
-        this.addressRepository = addressRepository;
         this.patientDTOMapper = patientDTOMapper;
     }
 

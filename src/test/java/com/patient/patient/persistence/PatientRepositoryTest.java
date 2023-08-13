@@ -39,6 +39,18 @@ class PatientRepositoryTest {
         assertThat(expected).isTrue();
     }
 
+    @Test
+    void itShouldCheckThatPatientDoesNotExistByMadeUpSSN() {
+        // given
+        final String generatedSSN = generateSSN();
+
+        // when
+        boolean expected = patientRepository.existsBySSN(generatedSSN);
+
+        // then
+        assertThat(expected).isFalse();
+    }
+
     private static String generateSSN() {
         byte[] array = new byte[7]; // length is bounded by 7
         new Random().nextBytes(array);
