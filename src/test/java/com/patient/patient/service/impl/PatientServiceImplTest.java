@@ -3,6 +3,7 @@ package com.patient.patient.service.impl;
 import com.patient.patient.exception.PatientServiceException;
 import com.patient.patient.model.GenderEnum;
 import com.patient.patient.model.NewPatientRequest;
+import com.patient.patient.model.PatientDTO;
 import com.patient.patient.model.PatientDTOMapper;
 import com.patient.patient.persistence.AddressEntity;
 import com.patient.patient.persistence.EmergencyContactEntity;
@@ -14,8 +15,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
-
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Optional;
@@ -30,8 +31,8 @@ class PatientServiceImplTest {
 
     @Mock
     private PatientRepository patientRepository;
-    @Mock
-    private PatientDTOMapper patientDTOMapper;
+    @Spy
+    private PatientDTOMapper patientDTOMapper = new PatientDTOMapper();
     private PatientService patientService;
 
 
@@ -52,9 +53,12 @@ class PatientServiceImplTest {
     void canCreatePatient() throws PatientServiceException {
         // given
         final PatientEntity patient = generatePatient();
+        final PatientDTO patientDTO = patientDTOMapper.apply(patient);
+        when(patientRepository.save(patient)).thenReturn(patient);
+        when(patientDTOMapper.apply(patient)).thenReturn(patientDTO);
 
         // when
-        patientService.createPatient(patient);
+        final PatientDTO createdPatientDTO = patientService.createPatient(patient);
 
         // then
         final ArgumentCaptor<PatientEntity> patientArgumentCaptor =
@@ -65,6 +69,7 @@ class PatientServiceImplTest {
         final PatientEntity capturedPatient = patientArgumentCaptor.getValue();
 
         assertThat(capturedPatient).isEqualTo(patient);
+        assertThat(createdPatientDTO).isEqualTo(patientDTO);
     }
 
     @Test
@@ -72,14 +77,19 @@ class PatientServiceImplTest {
         // given
         UUID patientId = UUID.randomUUID();
         NewPatientRequest patientRequest = generatePatientRequest();
-        PatientEntity existingPatient = new PatientEntity();
+        PatientEntity existingPatient = new PatientEntity(patientRequest);
+        PatientDTO patientDTO = patientDTOMapper.apply(existingPatient);
         when(patientRepository.findById(patientId)).thenReturn(Optional.of(existingPatient));
+        when(patientRepository.save(existingPatient)).thenReturn(existingPatient);
+        when(patientDTOMapper.apply(existingPatient)).thenReturn(patientDTO);
 
         // when
-        patientService.updatePatient(patientRequest, patientId);
+        Optional<PatientDTO> optionalPatientDTO = patientService.updatePatient(patientRequest, patientId);
 
         // then
         verify(patientRepository).save(existingPatient);
+        final PatientDTO existingPatientDTO = patientDTOMapper.apply(existingPatient);
+        assertThat(optionalPatientDTO.get()).isEqualTo(existingPatientDTO);
     }
 
     @Test

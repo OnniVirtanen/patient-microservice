@@ -4,6 +4,7 @@ import com.patient.patient.exception.PatientServiceException;
 import com.patient.patient.model.GenderEnum;
 import com.patient.patient.model.NewPatientRequest;
 import com.patient.patient.model.PatientDTO;
+import com.patient.patient.model.PatientRemoveResponse;
 import com.patient.patient.persistence.PatientEntity;
 import com.patient.patient.service.PatientService;
 import jakarta.validation.Valid;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @RestController
@@ -32,10 +34,10 @@ public class PatientController {
     }
 
     @PostMapping(path = "/patient", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> createPatient(final @Validated @RequestBody NewPatientRequest request) {
+    public ResponseEntity<PatientDTO> createPatient(final @Validated @RequestBody NewPatientRequest request) {
         try {
-            final PatientEntity patient = new PatientEntity(request);
-            return patientService.createPatient(patient);
+            final PatientDTO savedPatient = patientService.createPatient(new PatientEntity(request));
+            return ResponseEntity.ok(savedPatient);
         } catch (final PatientServiceException e) {
             logger.error(e.getMessage(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
@@ -54,10 +56,12 @@ public class PatientController {
     }
 
     @PutMapping(path = "/patient/{patientID}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> updatePatient(final @PathVariable("patientID") UUID id,
+    public ResponseEntity<PatientDTO> updatePatient(final @PathVariable("patientID") UUID id,
                                                 final @Valid @RequestBody NewPatientRequest request) {
         try {
-            return patientService.updatePatient(request, id);
+            final Optional<PatientDTO> optionalPatient = patientService.updatePatient(request, id);
+            return optionalPatient.map(ResponseEntity::ok).orElseGet(() ->
+                    ResponseEntity.status(HttpStatus.BAD_REQUEST).build());
         } catch (final PatientServiceException e) {
             logger.error(e.getMessage(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
@@ -67,7 +71,13 @@ public class PatientController {
     @DeleteMapping(path = "/patient/{patientID}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> removePatient(final @PathVariable("patientID") UUID id) {
         try {
-            return patientService.removePatient(id);
+            final PatientRemoveResponse removeResponse = patientService.removePatient(id);
+
+            if (removeResponse.patientWasFound()) {
+                return ResponseEntity.ok("Patient was removed successfully");
+            } else {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+            }
         } catch (final PatientServiceException e) {
             logger.error(e.getMessage(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();

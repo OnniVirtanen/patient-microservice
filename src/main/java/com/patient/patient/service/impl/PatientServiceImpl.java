@@ -10,6 +10,7 @@ import com.patient.patient.service.PatientService;
 import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -42,17 +43,17 @@ public class PatientServiceImpl implements PatientService {
     }
 
     @Override
-    public ResponseEntity<String> createPatient(final PatientEntity patient) throws PatientServiceException {
+    public PatientDTO createPatient(final PatientEntity patient) throws PatientServiceException {
         try {
-            patientRepository.save(patient);
-            return ResponseEntity.ok("Patient created successfully.");
+            final PatientEntity savedPatient = patientRepository.save(patient);
+            return patientDTOMapper.apply(savedPatient);
         } catch (Exception e) {
             throw new PatientServiceException("Failure in saving patient.", e);
         }
     }
 
     @Override
-    public ResponseEntity<String> updatePatient(final NewPatientRequest patientRequest, final UUID id) throws PatientServiceException {
+    public Optional<PatientDTO> updatePatient(final NewPatientRequest patientRequest, final UUID id) throws PatientServiceException {
         try {
             final Optional<PatientEntity> optionalPatient = patientRepository.findById(id);
 
@@ -66,14 +67,14 @@ public class PatientServiceImpl implements PatientService {
                 patient.setDateOfBirth(patientRequest.dateOfBirth());
 
                 try {
-                    patientRepository.save(patient);
-                    return ResponseEntity.ok("Patient updated successfully.");
+                     final PatientEntity updatedPatient = patientRepository.save(patient);
+                     return Optional.of(patientDTOMapper.apply(updatedPatient));
                 } catch (Exception e) {
                     throw new PatientServiceException("Failure in saving patient.", e);
                 }
             }
             else {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+                return Optional.empty();
             }
         } catch (Exception e) {
             throw new PatientServiceException(e);
@@ -82,13 +83,21 @@ public class PatientServiceImpl implements PatientService {
 
     @Override
     @Transactional
-    public ResponseEntity<String> removePatient(final UUID id) throws PatientServiceException {
+    public PatientRemoveResponse removePatient(final UUID id) throws PatientServiceException {
+        final PatientRemoveResponse response = new PatientRemoveResponse();
         final Optional<PatientEntity> optionalPatient = patientRepository.findById(id);
 
         if (optionalPatient.isPresent()) {
-            patientRepository.deleteById(id);
-            return ResponseEntity.ok().build();
+            try {
+                patientRepository.deleteById(id);
+            } catch (Exception e) {
+                throw new PatientServiceException("Failure in deleting patient");
+            }
+            response.setPatientWasFound(true);
         }
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        else {
+            response.setPatientWasFound(false);
+        }
+        return response;
     }
 }
