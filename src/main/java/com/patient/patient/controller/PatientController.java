@@ -61,7 +61,7 @@ public class PatientController {
         try {
             final Optional<PatientDTO> optionalPatient = patientService.updatePatient(request, id);
             return optionalPatient.map(ResponseEntity::ok).orElseGet(() ->
-                    ResponseEntity.status(HttpStatus.BAD_REQUEST).build());
+                    ResponseEntity.status(HttpStatus.NOT_FOUND).build());
         } catch (final PatientServiceException e) {
             logger.error(e.getMessage(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
@@ -76,7 +76,7 @@ public class PatientController {
             if (removeResponse.patientWasFound()) {
                 return ResponseEntity.ok("Patient was removed successfully");
             } else {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
             }
         } catch (final PatientServiceException e) {
             logger.error(e.getMessage(), e);
