@@ -1,10 +1,8 @@
 package com.patient.patient.persistence;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.patient.patient.model.RelationshipEnum;
 import jakarta.persistence.*;
 
-import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;

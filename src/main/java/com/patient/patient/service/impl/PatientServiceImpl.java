@@ -2,17 +2,12 @@ package com.patient.patient.service.impl;
 
 import com.patient.patient.exception.PatientServiceException;
 import com.patient.patient.model.*;
-import com.patient.patient.persistence.AddressEntity;
-import com.patient.patient.persistence.AddressRepository;
 import com.patient.patient.persistence.PatientEntity;
 import com.patient.patient.persistence.PatientRepository;
 import com.patient.patient.service.PatientService;
 import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.*;

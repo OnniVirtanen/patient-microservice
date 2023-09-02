@@ -5,7 +5,6 @@ import com.patient.patient.model.NewPatientRequest;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
-import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
