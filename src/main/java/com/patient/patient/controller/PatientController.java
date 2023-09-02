@@ -1,7 +1,6 @@
 package com.patient.patient.controller;
 
 import com.patient.patient.exception.PatientServiceException;
-import com.patient.patient.model.GenderEnum;
 import com.patient.patient.model.NewPatientRequest;
 import com.patient.patient.model.PatientDTO;
 import com.patient.patient.model.PatientRemoveResponse;
@@ -13,15 +12,23 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.lang.NonNull;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+/**
+ * Rest Controller responsible for handling patient-related requests.
+ */
 @RestController
 @RequestMapping("api/")
 public class PatientController {
@@ -33,6 +40,12 @@ public class PatientController {
         this.patientService = patientService;
     }
 
+    /**
+     * Endpoint to create a new patient.
+     *
+     * @param request Patient creation request.
+     * @return The newly created patient or an error response.
+     */
     @PostMapping(path = "/patient", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<PatientDTO> createPatient(final @Validated @RequestBody NewPatientRequest request) {
         try {
@@ -44,6 +57,11 @@ public class PatientController {
         }
     }
 
+    /**
+     * Endpoint to retrieve a list of all patients.
+     *
+     * @return List of patients or an error response.
+     */
     @GetMapping(path = "/patients", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<PatientDTO>> selectPatients() {
         try {
@@ -55,6 +73,13 @@ public class PatientController {
         }
     }
 
+    /**
+     * Endpoint to update details of an existing patient.
+     *
+     * @param id      The UUID identifier of the patient to be updated.
+     * @param request Patient update request.
+     * @return The updated patient, a not found, or an error response.
+     */
     @PutMapping(path = "/patient/{patientID}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<PatientDTO> updatePatient(final @PathVariable("patientID") UUID id,
                                                 final @Valid @RequestBody NewPatientRequest request) {
@@ -68,6 +93,12 @@ public class PatientController {
         }
     }
 
+    /**
+     * Endpoint to remove an existing patient.
+     *
+     * @param id The UUID identifier of the patient to be removed.
+     * @return Success message or an error/not found response.
+     */
     @DeleteMapping(path = "/patient/{patientID}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> removePatient(final @PathVariable("patientID") UUID id) {
         try {

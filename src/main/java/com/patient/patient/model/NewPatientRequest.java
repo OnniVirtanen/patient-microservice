@@ -5,6 +5,11 @@ import org.springframework.lang.NonNull;
 
 import java.time.LocalDate;
 
+/**
+ * Represents a request to create a new patient. This record encapsulates the necessary
+ * details required to register a new patient, with built-in validation annotations
+ * to ensure the integrity of the incoming data.
+ */
 public record NewPatientRequest(
 
         @NotEmpty

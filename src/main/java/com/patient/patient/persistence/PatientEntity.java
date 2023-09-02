@@ -2,13 +2,27 @@ package com.patient.patient.persistence;
 
 import com.patient.patient.model.GenderEnum;
 import com.patient.patient.model.NewPatientRequest;
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.Table;
 
 import java.time.LocalDate;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 
+/**
+ * Represents a patient entity within the system.
+ * Holds patient details such as their name, gender, date of birth, and associated addresses and emergency contacts.
+ */
 @Entity(name = "Patient")
 @Table(name = "patient")
 public class PatientEntity {
@@ -35,6 +49,9 @@ public class PatientEntity {
     @Column(name = "date_of_birth", nullable = false)
     private LocalDate dateOfBirth;
 
+    /**
+     * Collection of addresses associated with the patient.
+     */
     @ManyToMany
     @JoinTable(
             name = "patient_address",
@@ -42,6 +59,9 @@ public class PatientEntity {
             inverseJoinColumns = @JoinColumn(name = "address_id"))
     private Set<AddressEntity> addresses;
 
+    /**
+     * Collection of emergency contacts associated with the patient.
+     */
     @ManyToMany
     @JoinTable(
             name = "patient_emergency_contact",

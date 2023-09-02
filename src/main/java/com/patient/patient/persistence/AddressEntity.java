@@ -1,11 +1,22 @@
 package com.patient.patient.persistence;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.Table;
 
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 
+/**
+ * Represents an address entity within the system.
+ * Contains information about an address including street, city, state, and country.
+ * Also includes relational mappings to patients and their emergency contacts.
+ */
 @Entity(name = "address")
 @Table(name = "address")
 public class AddressEntity {
@@ -31,9 +42,15 @@ public class AddressEntity {
     @Column(name = "primary_address", nullable = false)
     private Boolean primaryAddress;
 
+    /**
+     * Collection of emergency contacts associated with this address.
+     */
     @ManyToMany(mappedBy = "addresses")
     private Set<EmergencyContactEntity> emergencyContacts;
 
+    /**
+     * Collection of patients associated with this address.
+     */
     @ManyToMany(mappedBy = "addresses")
     private Set<PatientEntity> patients;
 

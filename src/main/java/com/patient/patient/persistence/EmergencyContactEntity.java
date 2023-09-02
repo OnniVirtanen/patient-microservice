@@ -1,12 +1,26 @@
 package com.patient.patient.persistence;
 
 import com.patient.patient.model.RelationshipEnum;
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.Table;
 
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 
+/**
+ * Represents an emergency contact entity within the system.
+ * Holds details such as name, phone number, relationship to the patient, and associated addresses.
+ */
 @Entity(name = "Emergency_Contact")
 @Table(name = "emergency_contact")
 public class EmergencyContactEntity {
@@ -26,6 +40,9 @@ public class EmergencyContactEntity {
     @Column(name = "phone_number", nullable = false)
     private String phoneNumber;
 
+    /**
+     * Relationship of the emergency contact to the patient.
+     */
     @Enumerated(EnumType.STRING)
     @Column(name = "relationship", nullable = false)
     private RelationshipEnum relationship;
@@ -33,6 +50,9 @@ public class EmergencyContactEntity {
     @Column(name = "social_security_number", nullable = false)
     private String SSN;
 
+    /**
+     * Collection of addresses associated with the emergency contact.
+     */
     @ManyToMany
     @JoinTable(
             name = "emergency_contact_address",
@@ -40,6 +60,9 @@ public class EmergencyContactEntity {
             inverseJoinColumns = @JoinColumn(name = "address_id"))
     private Set<AddressEntity> addresses;
 
+    /**
+     * Collection of patients who have listed this entity as an emergency contact.
+     */
     @ManyToMany(mappedBy = "emergencyContactEntities")
     private Set<PatientEntity> patients;
 
