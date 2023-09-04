@@ -16,13 +16,15 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import static com.patient.patient.model.Constants.SELECT_PATIENTS_ERR_MSG;
+import static com.patient.patient.model.Constants.CREATE_PATIENT_ERR_MSG;
+import static com.patient.patient.model.Constants.UPDATE_PATIENT_ERR_MSG;
+import static com.patient.patient.model.Constants.REMOVE_PATIENT_ERR_MSG;
+
 @Service
 public class PatientServiceImpl implements PatientService {
 
-    private static final String SELECT_PATIENTS_ERR_MSG = "Failure in selecting patients.";
-    private static final String CREATE_PATIENT_ERR_MSG = "Failure in creating patient.";
-    private static final String UPDATE_PATIENT_ERR_MSG = "Failure in updating patient.";
-    private static final String REMOVE_PATIENT_ERR_MSG = "Failure in removing patient.";
+
     private final PatientRepository patientRepository;
     private final PatientDTOMapper patientDTOMapper;
 
