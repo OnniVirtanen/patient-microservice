@@ -66,7 +66,7 @@ public class PatientController {
 
     @PutMapping(path = "/{patientID}")
     public ResponseEntity<PatientDTO> updatePatient(final @PathVariable("patientID") UUID id,
-                                                final @Valid @RequestBody NewPatientRequest request) {
+                                                    final @Valid @RequestBody NewPatientRequest request) {
         try {
             Optional<PatientDTO> optionalPatient = patientService.updatePatient(request, id);
             return optionalPatient.map(ResponseEntity::ok).orElseGet(() ->
