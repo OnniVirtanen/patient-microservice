@@ -26,11 +26,13 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import static com.patient.patient.model.Constants.PATIENT_CONTROLLER_API_PATH;
+
 /**
  * Rest Controller responsible for handling patient-related requests.
  */
 @RestController
-@RequestMapping("api/")
+@RequestMapping(value = PATIENT_CONTROLLER_API_PATH, produces = MediaType.APPLICATION_JSON_VALUE)
 public class PatientController {
 
     private final Logger logger = LoggerFactory.getLogger(PatientController.class);
@@ -40,77 +42,53 @@ public class PatientController {
         this.patientService = patientService;
     }
 
-    /**
-     * Endpoint to create a new patient.
-     *
-     * @param request Patient creation request.
-     * @return The newly created patient or an error response.
-     */
-    @PostMapping(path = "/patient", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping
     public ResponseEntity<PatientDTO> createPatient(final @Validated @RequestBody NewPatientRequest request) {
         try {
-            final PatientDTO savedPatient = patientService.createPatient(new PatientEntity(request));
+            PatientDTO savedPatient = patientService.createPatient(new PatientEntity(request));
             return ResponseEntity.ok(savedPatient);
-        } catch (final PatientServiceException e) {
-            logger.error(e.getMessage(), e);
+        } catch (PatientServiceException exception) {
+            logger.error(exception.getMessage(), exception);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 
-    /**
-     * Endpoint to retrieve a list of all patients.
-     *
-     * @return List of patients or an error response.
-     */
-    @GetMapping(path = "/patients", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping
     public ResponseEntity<List<PatientDTO>> selectPatients() {
         try {
-            final List<PatientDTO> patientDTOS = patientService.selectPatients();
+            List<PatientDTO> patientDTOS = patientService.selectPatients();
             return ResponseEntity.ok(patientDTOS);
-        } catch (final PatientServiceException e) {
-            logger.error(e.getMessage(), e);
+        } catch (PatientServiceException exception) {
+            logger.error(exception.getMessage(), exception);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 
-    /**
-     * Endpoint to update details of an existing patient.
-     *
-     * @param id      The UUID identifier of the patient to be updated.
-     * @param request Patient update request.
-     * @return The updated patient, a not found, or an error response.
-     */
-    @PutMapping(path = "/patient/{patientID}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PutMapping(path = "/{patientID}")
     public ResponseEntity<PatientDTO> updatePatient(final @PathVariable("patientID") UUID id,
                                                 final @Valid @RequestBody NewPatientRequest request) {
         try {
-            final Optional<PatientDTO> optionalPatient = patientService.updatePatient(request, id);
+            Optional<PatientDTO> optionalPatient = patientService.updatePatient(request, id);
             return optionalPatient.map(ResponseEntity::ok).orElseGet(() ->
                     ResponseEntity.status(HttpStatus.NOT_FOUND).build());
-        } catch (final PatientServiceException e) {
-            logger.error(e.getMessage(), e);
+        } catch (PatientServiceException exception) {
+            logger.error(exception.getMessage(), exception);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 
-    /**
-     * Endpoint to remove an existing patient.
-     *
-     * @param id The UUID identifier of the patient to be removed.
-     * @return Success message or an error/not found response.
-     */
-    @DeleteMapping(path = "/patient/{patientID}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> removePatient(final @PathVariable("patientID") UUID id) {
+    @DeleteMapping(path = "/{patientID}")
+    public ResponseEntity<String> removePatient(final @PathVariable("patientID") UUID patientId) {
         try {
-            final PatientRemoveResponse removeResponse = patientService.removePatient(id);
+            PatientRemoveResponse removeResponse = patientService.removePatient(patientId);
 
             if (removeResponse.patientWasFound()) {
                 return ResponseEntity.ok("Patient was removed successfully");
             } else {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
             }
-        } catch (final PatientServiceException e) {
-            logger.error(e.getMessage(), e);
+        } catch (PatientServiceException exception) {
+            logger.error(exception.getMessage(), exception);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }

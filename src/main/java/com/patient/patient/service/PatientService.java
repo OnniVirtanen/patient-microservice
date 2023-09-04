@@ -45,9 +45,9 @@ public interface PatientService {
     /**
      * Removes a patient record.
      *
-     * @param id The UUID identifier of the patient to be removed.
+     * @param patientId The UUID identifier of the patient to be removed.
      * @return A {@link PatientRemoveResponse} object indicating the removal outcome.
      * @throws PatientServiceException if there's any issue removing the patient.
      */
-    PatientRemoveResponse removePatient(UUID id) throws PatientServiceException;
+    PatientRemoveResponse removePatient(UUID patientId) throws PatientServiceException;
 }

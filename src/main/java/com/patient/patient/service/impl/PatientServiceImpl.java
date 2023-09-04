@@ -19,6 +19,10 @@ import java.util.stream.Collectors;
 @Service
 public class PatientServiceImpl implements PatientService {
 
+    private static final String SELECT_PATIENTS_ERR_MSG = "Failure in selecting patients.";
+    private static final String CREATE_PATIENT_ERR_MSG = "Failure in creating patient.";
+    private static final String UPDATE_PATIENT_ERR_MSG = "Failure in updating patient.";
+    private static final String REMOVE_PATIENT_ERR_MSG = "Failure in removing patient.";
     private final PatientRepository patientRepository;
     private final PatientDTOMapper patientDTOMapper;
 
@@ -34,28 +38,32 @@ public class PatientServiceImpl implements PatientService {
                     .stream()
                     .map(patientDTOMapper)
                     .collect(Collectors.toList());
-        } catch (Exception e) {
-            throw new PatientServiceException(e);
+        } catch (Exception exception) {
+            throw new PatientServiceException(SELECT_PATIENTS_ERR_MSG, exception);
         }
     }
 
     @Override
+    @Transactional
     public PatientDTO createPatient(final PatientEntity patient) throws PatientServiceException {
         try {
-            final PatientEntity savedPatient = patientRepository.save(patient);
+            PatientEntity savedPatient = patientRepository.save(patient);
             return patientDTOMapper.apply(savedPatient);
-        } catch (Exception e) {
-            throw new PatientServiceException("Failure in saving patient.", e);
+        } catch (Exception exception) {
+            throw new PatientServiceException(CREATE_PATIENT_ERR_MSG, exception);
         }
     }
 
     @Override
-    public Optional<PatientDTO> updatePatient(final NewPatientRequest patientRequest, final UUID id) throws PatientServiceException {
+    @Transactional
+    public Optional<PatientDTO> updatePatient(final NewPatientRequest patientRequest, final UUID id)
+            throws PatientServiceException {
         try {
-            final Optional<PatientEntity> optionalPatient = patientRepository.findById(id);
+            Optional<PatientEntity> optionalPatient = patientRepository.findById(id);
+            boolean patientIsPresent = optionalPatient.isPresent();
 
-            if (optionalPatient.isPresent()) {
-                final PatientEntity patient = optionalPatient.get();
+            if (patientIsPresent) {
+                PatientEntity patient = optionalPatient.get();
                 patient.setFirstName(patientRequest.firstName());
                 patient.setLastName(patientRequest.secondName());
                 patient.setSecondName(patientRequest.lastName());
@@ -63,38 +71,33 @@ public class PatientServiceImpl implements PatientService {
                 patient.setSSN(patientRequest.SSN());
                 patient.setDateOfBirth(patientRequest.dateOfBirth());
 
-                try {
-                     final PatientEntity updatedPatient = patientRepository.save(patient);
-                     return Optional.of(patientDTOMapper.apply(updatedPatient));
-                } catch (Exception e) {
-                    throw new PatientServiceException("Failure in saving patient.", e);
-                }
+                PatientEntity updatedPatient = patientRepository.save(patient);
+                return Optional.of(patientDTOMapper.apply(updatedPatient));
             }
             else {
                 return Optional.empty();
             }
-        } catch (Exception e) {
-            throw new PatientServiceException(e);
+        } catch (Exception exception) {
+            throw new PatientServiceException(UPDATE_PATIENT_ERR_MSG, exception);
         }
     }
 
     @Override
     @Transactional
-    public PatientRemoveResponse removePatient(final UUID id) throws PatientServiceException {
-        final PatientRemoveResponse response = new PatientRemoveResponse();
-        final Optional<PatientEntity> optionalPatient = patientRepository.findById(id);
+    public PatientRemoveResponse removePatient(final UUID patientId) throws PatientServiceException {
+        try {
+            Optional<PatientEntity> optionalPatient = patientRepository.findById(patientId);
+            boolean patientIsPresent = optionalPatient.isPresent();
 
-        if (optionalPatient.isPresent()) {
-            try {
-                patientRepository.deleteById(id);
-            } catch (Exception e) {
-                throw new PatientServiceException("Failure in deleting patient");
+            if (patientIsPresent) {
+                patientRepository.deleteById(patientId);
             }
-            response.setPatientWasFound(true);
+
+            PatientRemoveResponse response = new PatientRemoveResponse();
+            response.setPatientWasFound(patientIsPresent);
+            return response;
+        } catch (Exception exception) {
+            throw new PatientServiceException(REMOVE_PATIENT_ERR_MSG, exception);
         }
-        else {
-            response.setPatientWasFound(false);
-        }
-        return response;
     }
 }
