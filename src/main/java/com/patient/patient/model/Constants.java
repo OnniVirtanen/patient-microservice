@@ -22,4 +22,5 @@ public abstract class Constants {
     public static final String CREATE_PATIENT_ERR_MSG = "Failure in creating patient.";
     public static final String UPDATE_PATIENT_ERR_MSG = "Failure in updating patient.";
     public static final String DELETE_PATIENT_ERR_MSG = "Failure in deleting patient.";
+    public static final String UNSUPPORTED_SSN_TYPE = "Unsupported SSN type";
 }
