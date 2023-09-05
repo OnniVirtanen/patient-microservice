@@ -22,12 +22,12 @@ import static com.patient.patient.model.Constants.UPDATE_PATIENT_ERR_MSG;
 import static com.patient.patient.model.Constants.DELETE_PATIENT_ERR_MSG;
 
 @Service
-public class PatientServiceImp implements PatientService {
+public class PatientServiceImpl implements PatientService {
 
     private final PatientRepository patientRepository;
     private final PatientDTOMapper patientDTOMapper;
 
-    public PatientServiceImp(PatientRepository patientRepository, PatientDTOMapper patientDTOMapper) {
+    public PatientServiceImpl(PatientRepository patientRepository, PatientDTOMapper patientDTOMapper) {
         this.patientRepository = patientRepository;
         this.patientDTOMapper = patientDTOMapper;
     }
@@ -57,27 +57,14 @@ public class PatientServiceImp implements PatientService {
 
     @Override
     @Transactional
-    public Optional<PatientDTO> updatePatient(final NewPatientRequest patientRequest, final UUID id)
+    public Optional<PatientDTO> updatePatient(final NewPatientRequest newPatientRequest, final UUID id)
             throws PatientServiceException {
         try {
-            Optional<PatientEntity> optionalPatient = patientRepository.findById(id);
-            boolean patientIsPresent = optionalPatient.isPresent();
-
-            if (patientIsPresent) {
-                PatientEntity patient = optionalPatient.get();
-                patient.setFirstName(patientRequest.firstName());
-                patient.setLastName(patientRequest.secondName());
-                patient.setSecondName(patientRequest.lastName());
-                patient.setGender(patientRequest.gender());
-                patient.setSSN(patientRequest.SSN());
-                patient.setDateOfBirth(patientRequest.dateOfBirth());
-
-                PatientEntity updatedPatient = patientRepository.save(patient);
-                return Optional.of(patientDTOMapper.apply(updatedPatient));
-            }
-            else {
-                return Optional.empty();
-            }
+            Optional<PatientEntity> patientFromDb = patientRepository.findById(id);
+            if (patientFromDb.isEmpty()) { return Optional.empty(); }
+            PatientEntity patient = PatientEntity.modifyPatient(newPatientRequest, patientFromDb.get());
+            PatientEntity updatedPatient = patientRepository.save(patient);
+            return Optional.of(patientDTOMapper.apply(updatedPatient));
         } catch (Exception exception) {
             throw new PatientServiceException(UPDATE_PATIENT_ERR_MSG, exception);
         }
@@ -87,16 +74,10 @@ public class PatientServiceImp implements PatientService {
     @Transactional
     public PatientDeleteResponse deletePatient(final UUID patientId) throws PatientServiceException {
         try {
-            Optional<PatientEntity> optionalPatient = patientRepository.findById(patientId);
-            boolean isPatientPresent = optionalPatient.isPresent();
-
-            if (isPatientPresent) {
-                patientRepository.deleteById(patientId);
-            }
-
-            PatientDeleteResponse response = new PatientDeleteResponse();
-            response.setIsPatientFound(isPatientPresent);
-            return response;
+            Optional<PatientEntity> patient = patientRepository.findById(patientId);
+            boolean isPatientPresent = patient.isPresent();
+            if (isPatientPresent) { patientRepository.deleteById(patientId); }
+            return new PatientDeleteResponse(isPatientPresent);
         } catch (Exception exception) {
             throw new PatientServiceException(DELETE_PATIENT_ERR_MSG, exception);
         }

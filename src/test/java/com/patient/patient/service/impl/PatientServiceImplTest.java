@@ -27,7 +27,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class PatientServiceImpTest {
+class PatientServiceImplTest {
 
     @Mock
     private PatientRepository patientRepository;
@@ -38,7 +38,7 @@ class PatientServiceImpTest {
 
     @BeforeEach
     void setUp() {
-        patientService = new PatientServiceImp(patientRepository, patientDTOMapper);
+        patientService = new PatientServiceImpl(patientRepository, patientDTOMapper);
     }
 
     @Test

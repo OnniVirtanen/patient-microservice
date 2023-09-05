@@ -6,6 +6,10 @@ package com.patient.patient.model;
  */
 public class PatientDeleteResponse {
 
+    public PatientDeleteResponse(final boolean isPatientFound) {
+        this.isPatientFound = isPatientFound;
+    }
+
     private boolean isPatientFound;
 
     public boolean isPatientFound() {
