@@ -27,7 +27,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class PatientServiceImplTest {
+class PatientServiceImpTest {
 
     @Mock
     private PatientRepository patientRepository;
@@ -38,13 +38,13 @@ class PatientServiceImplTest {
 
     @BeforeEach
     void setUp() {
-        patientService = new PatientServiceImpl(patientRepository, patientDTOMapper);
+        patientService = new PatientServiceImp(patientRepository, patientDTOMapper);
     }
 
     @Test
     void canGetAllPatients() throws PatientServiceException {
         // when
-        patientService.selectPatients();
+        patientService.getAllPatients();
         // then
         verify(patientRepository).findAll();
     }
@@ -52,13 +52,14 @@ class PatientServiceImplTest {
     @Test
     void canCreatePatient() throws PatientServiceException {
         // given
-        final PatientEntity patient = generatePatient();
+        final NewPatientRequest newPatient = generatePatientRequest();
+        final PatientEntity patient = new PatientEntity(newPatient);
         final PatientDTO patientDTO = patientDTOMapper.apply(patient);
         when(patientRepository.save(patient)).thenReturn(patient);
         when(patientDTOMapper.apply(patient)).thenReturn(patientDTO);
 
         // when
-        final PatientDTO createdPatientDTO = patientService.createPatient(patient);
+        final PatientDTO createdPatientDTO = patientService.createPatient(newPatient);
 
         // then
         final ArgumentCaptor<PatientEntity> patientArgumentCaptor =
@@ -93,14 +94,14 @@ class PatientServiceImplTest {
     }
 
     @Test
-    void canRemovePatient() throws PatientServiceException {
+    void canDeletePatient() throws PatientServiceException {
         // given
         UUID patientId = UUID.randomUUID();
         PatientEntity patient = new PatientEntity();
         when(patientRepository.findById(patientId)).thenReturn(Optional.of(patient));
 
         // when
-        patientService.removePatient(patientId);
+        patientService.deletePatient(patientId);
 
         // then
         verify(patientRepository).deleteById(patientId);

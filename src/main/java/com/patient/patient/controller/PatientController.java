@@ -3,7 +3,7 @@ package com.patient.patient.controller;
 import com.patient.patient.exception.PatientServiceException;
 import com.patient.patient.model.NewPatientRequest;
 import com.patient.patient.model.PatientDTO;
-import com.patient.patient.model.PatientRemoveResponse;
+import com.patient.patient.model.PatientDeleteResponse;
 import com.patient.patient.persistence.PatientEntity;
 import com.patient.patient.service.PatientService;
 import jakarta.validation.Valid;
@@ -43,9 +43,9 @@ public class PatientController {
     }
 
     @PostMapping
-    public ResponseEntity<PatientDTO> createPatient(final @Validated @RequestBody NewPatientRequest request) {
+    public ResponseEntity<PatientDTO> createPatient(final @Validated @RequestBody NewPatientRequest newPatient) {
         try {
-            PatientDTO savedPatient = patientService.createPatient(new PatientEntity(request));
+            PatientDTO savedPatient = patientService.createPatient(newPatient);
             return ResponseEntity.ok(savedPatient);
         } catch (PatientServiceException exception) {
             logger.error(exception.getMessage(), exception);
@@ -54,9 +54,9 @@ public class PatientController {
     }
 
     @GetMapping
-    public ResponseEntity<List<PatientDTO>> selectPatients() {
+    public ResponseEntity<List<PatientDTO>> getAllPatients() {
         try {
-            List<PatientDTO> patientDTOS = patientService.selectPatients();
+            List<PatientDTO> patientDTOS = patientService.getAllPatients();
             return ResponseEntity.ok(patientDTOS);
         } catch (PatientServiceException exception) {
             logger.error(exception.getMessage(), exception);
@@ -78,11 +78,11 @@ public class PatientController {
     }
 
     @DeleteMapping(path = "/{patientID}")
-    public ResponseEntity<String> removePatient(final @PathVariable("patientID") UUID patientId) {
+    public ResponseEntity<String> deletePatient(final @PathVariable("patientID") UUID patientId) {
         try {
-            PatientRemoveResponse removeResponse = patientService.removePatient(patientId);
+            PatientDeleteResponse deleteResponse = patientService.deletePatient(patientId);
 
-            if (removeResponse.patientWasFound()) {
+            if (deleteResponse.isPatientFound()) {
                 return ResponseEntity.ok("Patient was removed successfully");
             } else {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).build();

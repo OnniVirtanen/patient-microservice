@@ -18,8 +18,8 @@ public abstract class Constants {
     /**
      *  Error messages for patient service
      */
-    public static final String SELECT_PATIENTS_ERR_MSG = "Failure in selecting patients.";
+    public static final String GET_ALL_PATIENTS_ERR_MSG = "Failure in getting all patients.";
     public static final String CREATE_PATIENT_ERR_MSG = "Failure in creating patient.";
     public static final String UPDATE_PATIENT_ERR_MSG = "Failure in updating patient.";
-    public static final String REMOVE_PATIENT_ERR_MSG = "Failure in removing patient.";
+    public static final String DELETE_PATIENT_ERR_MSG = "Failure in deleting patient.";
 }

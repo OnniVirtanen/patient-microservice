@@ -4,7 +4,7 @@ import com.patient.patient.exception.PatientServiceException;
 import com.patient.patient.model.NewPatientRequest;
 import com.patient.patient.model.PatientDTO;
 import com.patient.patient.model.PatientDTOMapper;
-import com.patient.patient.model.PatientRemoveResponse;
+import com.patient.patient.model.PatientDeleteResponse;
 import com.patient.patient.persistence.PatientEntity;
 import com.patient.patient.persistence.PatientRepository;
 import com.patient.patient.service.PatientService;
@@ -16,40 +16,39 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import static com.patient.patient.model.Constants.SELECT_PATIENTS_ERR_MSG;
+import static com.patient.patient.model.Constants.GET_ALL_PATIENTS_ERR_MSG;
 import static com.patient.patient.model.Constants.CREATE_PATIENT_ERR_MSG;
 import static com.patient.patient.model.Constants.UPDATE_PATIENT_ERR_MSG;
-import static com.patient.patient.model.Constants.REMOVE_PATIENT_ERR_MSG;
+import static com.patient.patient.model.Constants.DELETE_PATIENT_ERR_MSG;
 
 @Service
-public class PatientServiceImpl implements PatientService {
-
+public class PatientServiceImp implements PatientService {
 
     private final PatientRepository patientRepository;
     private final PatientDTOMapper patientDTOMapper;
 
-    public PatientServiceImpl(PatientRepository patientRepository, PatientDTOMapper patientDTOMapper) {
+    public PatientServiceImp(PatientRepository patientRepository, PatientDTOMapper patientDTOMapper) {
         this.patientRepository = patientRepository;
         this.patientDTOMapper = patientDTOMapper;
     }
 
     @Override
-    public List<PatientDTO> selectPatients() throws PatientServiceException {
+    public List<PatientDTO> getAllPatients() throws PatientServiceException {
         try {
             return patientRepository.findAll()
                     .stream()
                     .map(patientDTOMapper)
                     .collect(Collectors.toList());
         } catch (Exception exception) {
-            throw new PatientServiceException(SELECT_PATIENTS_ERR_MSG, exception);
+            throw new PatientServiceException(GET_ALL_PATIENTS_ERR_MSG, exception);
         }
     }
 
     @Override
     @Transactional
-    public PatientDTO createPatient(final PatientEntity patient) throws PatientServiceException {
+    public PatientDTO createPatient(final NewPatientRequest newPatient) throws PatientServiceException {
         try {
-            PatientEntity savedPatient = patientRepository.save(patient);
+            PatientEntity savedPatient = patientRepository.save(new PatientEntity(newPatient));
             return patientDTOMapper.apply(savedPatient);
         } catch (Exception exception) {
             throw new PatientServiceException(CREATE_PATIENT_ERR_MSG, exception);
@@ -86,20 +85,20 @@ public class PatientServiceImpl implements PatientService {
 
     @Override
     @Transactional
-    public PatientRemoveResponse removePatient(final UUID patientId) throws PatientServiceException {
+    public PatientDeleteResponse deletePatient(final UUID patientId) throws PatientServiceException {
         try {
             Optional<PatientEntity> optionalPatient = patientRepository.findById(patientId);
-            boolean patientIsPresent = optionalPatient.isPresent();
+            boolean isPatientPresent = optionalPatient.isPresent();
 
-            if (patientIsPresent) {
+            if (isPatientPresent) {
                 patientRepository.deleteById(patientId);
             }
 
-            PatientRemoveResponse response = new PatientRemoveResponse();
-            response.setPatientWasFound(patientIsPresent);
+            PatientDeleteResponse response = new PatientDeleteResponse();
+            response.setIsPatientFound(isPatientPresent);
             return response;
         } catch (Exception exception) {
-            throw new PatientServiceException(REMOVE_PATIENT_ERR_MSG, exception);
+            throw new PatientServiceException(DELETE_PATIENT_ERR_MSG, exception);
         }
     }
 }
