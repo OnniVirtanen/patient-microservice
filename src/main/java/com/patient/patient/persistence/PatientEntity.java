@@ -30,7 +30,7 @@ public class PatientEntity {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @Column(name = "social_security_number", nullable = false)
+    @Column(name = "social_security_number", nullable = false, unique = true)
     private String SSN;
 
     @Enumerated(EnumType.STRING)

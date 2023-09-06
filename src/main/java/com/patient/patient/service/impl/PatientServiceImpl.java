@@ -1,10 +1,11 @@
 package com.patient.patient.service.impl;
 
+import com.patient.patient.exception.PatientAlreadyExistsException;
 import com.patient.patient.exception.PatientServiceException;
+import com.patient.patient.exception.PatientNotFoundException;
 import com.patient.patient.model.NewPatientRequest;
 import com.patient.patient.model.PatientDTO;
 import com.patient.patient.model.PatientDTOMapper;
-import com.patient.patient.model.PatientDeleteResponse;
 import com.patient.patient.persistence.PatientEntity;
 import com.patient.patient.persistence.PatientRepository;
 import com.patient.patient.service.PatientService;
@@ -16,10 +17,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import static com.patient.patient.model.Constants.GET_ALL_PATIENTS_ERR_MSG;
-import static com.patient.patient.model.Constants.CREATE_PATIENT_ERR_MSG;
-import static com.patient.patient.model.Constants.UPDATE_PATIENT_ERR_MSG;
-import static com.patient.patient.model.Constants.DELETE_PATIENT_ERR_MSG;
+import static com.patient.patient.model.Constants.*;
 
 @Service
 public class PatientServiceImpl implements PatientService {
@@ -33,7 +31,7 @@ public class PatientServiceImpl implements PatientService {
     }
 
     @Override
-    public List<PatientDTO> getAllPatients() throws PatientServiceException {
+    public List<PatientDTO> getAllPatients() {
         try {
             return patientRepository.findAll()
                     .stream()
@@ -46,10 +44,18 @@ public class PatientServiceImpl implements PatientService {
 
     @Override
     @Transactional
-    public PatientDTO createPatient(final NewPatientRequest newPatient) throws PatientServiceException {
+    public PatientDTO createPatient(final NewPatientRequest newPatient) {
         try {
+            boolean patientAlreadyExists = patientRepository.existsBySSN(newPatient.SSN());
+
+            if (patientAlreadyExists) {
+                throw new PatientAlreadyExistsException(PATIENT_ALREADY_EXISTS_ERR_MSG);
+            }
+
             PatientEntity savedPatient = patientRepository.save(new PatientEntity(newPatient));
             return patientDTOMapper.apply(savedPatient);
+        } catch (PatientAlreadyExistsException patientAlreadyExistsException) {
+            throw patientAlreadyExistsException;
         } catch (Exception exception) {
             throw new PatientServiceException(CREATE_PATIENT_ERR_MSG, exception);
         }
@@ -57,14 +63,17 @@ public class PatientServiceImpl implements PatientService {
 
     @Override
     @Transactional
-    public Optional<PatientDTO> updatePatient(final NewPatientRequest newPatientRequest, final UUID id)
-            throws PatientServiceException {
+    public PatientDTO updatePatient(final NewPatientRequest newPatientRequest, final UUID id) {
         try {
-            Optional<PatientEntity> patientFromDb = patientRepository.findById(id);
-            if (patientFromDb.isEmpty()) { return Optional.empty(); }
-            PatientEntity patient = PatientEntity.modifyPatient(newPatientRequest, patientFromDb.get());
+            Optional<PatientEntity> patientFromDB = patientRepository.findById(id);
+            if (patientFromDB.isEmpty()) {
+                throw new PatientNotFoundException(NO_PATIENT_FOUND_ERR_MSG);
+            }
+            PatientEntity patient = PatientEntity.modifyPatient(newPatientRequest, patientFromDB.get());
             PatientEntity updatedPatient = patientRepository.save(patient);
-            return Optional.of(patientDTOMapper.apply(updatedPatient));
+            return patientDTOMapper.apply(updatedPatient);
+        } catch (PatientNotFoundException patientNotFoundException) {
+            throw patientNotFoundException;
         } catch (Exception exception) {
             throw new PatientServiceException(UPDATE_PATIENT_ERR_MSG, exception);
         }
@@ -72,12 +81,15 @@ public class PatientServiceImpl implements PatientService {
 
     @Override
     @Transactional
-    public PatientDeleteResponse deletePatient(final UUID patientId) throws PatientServiceException {
+    public void deletePatient(final UUID patientId) {
         try {
             Optional<PatientEntity> patient = patientRepository.findById(patientId);
-            boolean isPatientPresent = patient.isPresent();
-            if (isPatientPresent) { patientRepository.deleteById(patientId); }
-            return new PatientDeleteResponse(isPatientPresent);
+            if (patient.isEmpty()) {
+                throw new PatientNotFoundException(NO_PATIENT_FOUND_ERR_MSG);
+            }
+            patientRepository.deleteById(patientId);
+        } catch (PatientNotFoundException patientNotFoundException) {
+          throw patientNotFoundException;
         } catch (Exception exception) {
             throw new PatientServiceException(DELETE_PATIENT_ERR_MSG, exception);
         }

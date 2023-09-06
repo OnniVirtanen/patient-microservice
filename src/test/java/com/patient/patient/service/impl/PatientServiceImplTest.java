@@ -85,12 +85,12 @@ class PatientServiceImplTest {
         when(patientDTOMapper.apply(existingPatient)).thenReturn(patientDTO);
 
         // when
-        Optional<PatientDTO> optionalPatientDTO = patientService.updatePatient(patientRequest, patientId);
+        PatientDTO returned = patientService.updatePatient(patientRequest, patientId);
 
         // then
         verify(patientRepository).save(existingPatient);
         final PatientDTO existingPatientDTO = patientDTOMapper.apply(existingPatient);
-        assertThat(optionalPatientDTO.get()).isEqualTo(existingPatientDTO);
+        assertThat(returned).isEqualTo(existingPatientDTO);
     }
 
     @Test
