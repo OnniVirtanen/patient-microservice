@@ -58,10 +58,7 @@ public class PatientServiceImpl implements PatientService {
     @Transactional
     public PatientDTO updatePatient(final NewPatientRequest newPatientRequest, final UUID id) {
         Optional<PatientEntity> patientFromDB = patientRepository.findById(id);
-        if (patientFromDB.isEmpty()) {
-            throw new PatientNotFoundException(NO_PATIENT_FOUND_ERR_MSG);
-        }
-
+        ensurePatientExists(patientFromDB);
         try {
             PatientEntity patient = PatientEntity.modifyPatient(newPatientRequest, patientFromDB.get());
             PatientEntity updatedPatient = patientRepository.save(patient);
@@ -74,14 +71,10 @@ public class PatientServiceImpl implements PatientService {
     @Override
     @Transactional
     public void deletePatient(final UUID patientId) {
+        Optional<PatientEntity> patientFromDB = patientRepository.findById(patientId);
+        ensurePatientExists(patientFromDB);
         try {
-            Optional<PatientEntity> patientFromDB = patientRepository.findById(patientId);
-            if (patientFromDB.isEmpty()) {
-                throw new PatientNotFoundException(NO_PATIENT_FOUND_ERR_MSG);
-            }
             patientRepository.deleteById(patientId);
-        } catch (PatientNotFoundException patientNotFoundException) {
-          throw patientNotFoundException;
         } catch (Exception exception) {
             throw new PatientServiceException(DELETE_PATIENT_ERR_MSG, exception);
         }
@@ -90,6 +83,12 @@ public class PatientServiceImpl implements PatientService {
     private void ensurePatientDoesNotExist(final String ssn) {
         if (patientRepository.existsBySSN(ssn)) {
             throw new PatientAlreadyExistsException(PATIENT_ALREADY_EXISTS_ERR_MSG);
+        }
+    }
+
+    private void ensurePatientExists(Optional<PatientEntity> patient) {
+        if (patient.isEmpty()) {
+            throw new PatientNotFoundException(NO_PATIENT_FOUND_ERR_MSG);
         }
     }
 }
