@@ -6,17 +6,16 @@ import com.patient.patient.service.PatientService;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 import static com.patient.patient.model.Constants.PATIENT_CONTROLLER_API_PATH;
+import static com.patient.patient.model.Constants.PATIENT_REMOVE_SUCCESS_MSG;
 
 @RestController
 @RequestMapping(value = PATIENT_CONTROLLER_API_PATH, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -51,6 +50,6 @@ public class PatientController {
     @DeleteMapping(path = "/{patientID}")
     public ResponseEntity<String> deletePatient(final @PathVariable("patientID") UUID patientId) {
         patientService.deletePatient(patientId);
-        return ResponseEntity.ok("Patient was removed successfully");
+        return ResponseEntity.ok(PATIENT_REMOVE_SUCCESS_MSG);
     }
 }

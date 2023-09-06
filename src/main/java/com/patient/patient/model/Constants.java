@@ -13,4 +13,5 @@ public abstract class Constants {
     public static final String DELETE_PATIENT_ERR_MSG = "Failure in deleting patient.";
     public static final String NO_PATIENT_FOUND_ERR_MSG = "No patient found with given id.";
     public static final String PATIENT_ALREADY_EXISTS_ERR_MSG = "Patient already exists.";
+    public static final String PATIENT_REMOVE_SUCCESS_MSG = "Patient was removed successfully";
 }
