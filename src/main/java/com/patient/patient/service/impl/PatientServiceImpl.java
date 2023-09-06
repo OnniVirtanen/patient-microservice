@@ -45,17 +45,10 @@ public class PatientServiceImpl implements PatientService {
     @Override
     @Transactional
     public PatientDTO createPatient(final NewPatientRequest newPatient) {
+        ensurePatientDoesNotExist(newPatient.SSN());
         try {
-            boolean patientAlreadyExists = patientRepository.existsBySSN(newPatient.SSN());
-
-            if (patientAlreadyExists) {
-                throw new PatientAlreadyExistsException(PATIENT_ALREADY_EXISTS_ERR_MSG);
-            }
-
             PatientEntity savedPatient = patientRepository.save(new PatientEntity(newPatient));
             return patientDTOMapper.apply(savedPatient);
-        } catch (PatientAlreadyExistsException patientAlreadyExistsException) {
-            throw patientAlreadyExistsException;
         } catch (Exception exception) {
             throw new PatientServiceException(CREATE_PATIENT_ERR_MSG, exception);
         }
@@ -64,16 +57,15 @@ public class PatientServiceImpl implements PatientService {
     @Override
     @Transactional
     public PatientDTO updatePatient(final NewPatientRequest newPatientRequest, final UUID id) {
+        Optional<PatientEntity> patientFromDB = patientRepository.findById(id);
+        if (patientFromDB.isEmpty()) {
+            throw new PatientNotFoundException(NO_PATIENT_FOUND_ERR_MSG);
+        }
+
         try {
-            Optional<PatientEntity> patientFromDB = patientRepository.findById(id);
-            if (patientFromDB.isEmpty()) {
-                throw new PatientNotFoundException(NO_PATIENT_FOUND_ERR_MSG);
-            }
             PatientEntity patient = PatientEntity.modifyPatient(newPatientRequest, patientFromDB.get());
             PatientEntity updatedPatient = patientRepository.save(patient);
             return patientDTOMapper.apply(updatedPatient);
-        } catch (PatientNotFoundException patientNotFoundException) {
-            throw patientNotFoundException;
         } catch (Exception exception) {
             throw new PatientServiceException(UPDATE_PATIENT_ERR_MSG, exception);
         }
@@ -83,8 +75,8 @@ public class PatientServiceImpl implements PatientService {
     @Transactional
     public void deletePatient(final UUID patientId) {
         try {
-            Optional<PatientEntity> patient = patientRepository.findById(patientId);
-            if (patient.isEmpty()) {
+            Optional<PatientEntity> patientFromDB = patientRepository.findById(patientId);
+            if (patientFromDB.isEmpty()) {
                 throw new PatientNotFoundException(NO_PATIENT_FOUND_ERR_MSG);
             }
             patientRepository.deleteById(patientId);
@@ -92,6 +84,12 @@ public class PatientServiceImpl implements PatientService {
           throw patientNotFoundException;
         } catch (Exception exception) {
             throw new PatientServiceException(DELETE_PATIENT_ERR_MSG, exception);
+        }
+    }
+
+    private void ensurePatientDoesNotExist(final String ssn) {
+        if (patientRepository.existsBySSN(ssn)) {
+            throw new PatientAlreadyExistsException(PATIENT_ALREADY_EXISTS_ERR_MSG);
         }
     }
 }
