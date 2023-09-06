@@ -4,7 +4,6 @@ import com.patient.patient.model.NewPatientRequest;
 import com.patient.patient.model.PatientDTO;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 public interface PatientService {
@@ -16,4 +15,6 @@ public interface PatientService {
     PatientDTO updatePatient(NewPatientRequest patientRequest, UUID id);
 
     void deletePatient(UUID patientId);
+
+    PatientDTO getPatientById(UUID patientId);
 }

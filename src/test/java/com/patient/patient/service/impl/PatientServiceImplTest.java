@@ -50,6 +50,18 @@ class PatientServiceImplTest {
     }
 
     @Test
+    void canGetPatientById() {
+        //given
+        UUID patientId = UUID.randomUUID();
+
+        // when
+        patientService.getPatientById(patientId);
+
+        // then
+        verify(patientRepository).findById(patientId);
+    }
+
+    @Test
     void canCreatePatient() throws PatientServiceException {
         // given
         final NewPatientRequest newPatient = generatePatientRequest();

@@ -56,9 +56,9 @@ public class PatientServiceImpl implements PatientService {
 
     @Override
     @Transactional
-    public PatientDTO updatePatient(final NewPatientRequest newPatientRequest, final UUID id) {
-        Optional<PatientEntity> patientFromDB = patientRepository.findById(id);
-        ensurePatientExists(patientFromDB);
+    public PatientDTO updatePatient(final NewPatientRequest newPatientRequest, final UUID patientId) {
+        Optional<PatientEntity> patientFromDB = patientRepository.findById(patientId);
+        patientFromDB.orElseThrow(() -> new PatientNotFoundException(NO_PATIENT_FOUND_ERR_MSG));
         try {
             PatientEntity patient = PatientEntity.modifyPatient(newPatientRequest, patientFromDB.get());
             PatientEntity updatedPatient = patientRepository.save(patient);
@@ -72,7 +72,7 @@ public class PatientServiceImpl implements PatientService {
     @Transactional
     public void deletePatient(final UUID patientId) {
         Optional<PatientEntity> patientFromDB = patientRepository.findById(patientId);
-        ensurePatientExists(patientFromDB);
+        patientFromDB.orElseThrow(() -> new PatientNotFoundException(NO_PATIENT_FOUND_ERR_MSG));
         try {
             patientRepository.deleteById(patientId);
         } catch (Exception exception) {
@@ -80,15 +80,16 @@ public class PatientServiceImpl implements PatientService {
         }
     }
 
+    @Override
+    public PatientDTO getPatientById(final UUID patientId) {
+        Optional<PatientEntity> patientFromDB = patientRepository.findById(patientId);
+        patientFromDB.orElseThrow(() -> new PatientNotFoundException(NO_PATIENT_FOUND_ERR_MSG));
+        return patientDTOMapper.apply(patientFromDB.get());
+    }
+
     private void ensurePatientDoesNotExist(final String ssn) {
         if (patientRepository.existsBySSN(ssn)) {
             throw new PatientAlreadyExistsException(PATIENT_ALREADY_EXISTS_ERR_MSG);
-        }
-    }
-
-    private void ensurePatientExists(Optional<PatientEntity> patient) {
-        if (patient.isEmpty()) {
-            throw new PatientNotFoundException(NO_PATIENT_FOUND_ERR_MSG);
         }
     }
 }

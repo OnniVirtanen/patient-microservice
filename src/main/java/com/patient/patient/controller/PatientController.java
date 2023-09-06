@@ -36,19 +36,25 @@ public class PatientController {
 
     @GetMapping
     public ResponseEntity<List<PatientDTO>> getAllPatients() {
-        List<PatientDTO> patientDTOS = patientService.getAllPatients();
-        return ResponseEntity.ok(patientDTOS);
+        List<PatientDTO> patients = patientService.getAllPatients();
+        return ResponseEntity.ok(patients);
     }
 
-    @PutMapping(path = "/{patientID}")
-    public ResponseEntity<PatientDTO> updatePatient(final @PathVariable("patientID") UUID id,
+    @GetMapping(path = "/{patientId}")
+    public ResponseEntity<PatientDTO> getPatientById(final @PathVariable("patientId") UUID patientId) {
+        PatientDTO patient = patientService.getPatientById(patientId);
+        return ResponseEntity.ok(patient);
+    }
+
+    @PutMapping(path = "/{patientId}")
+    public ResponseEntity<PatientDTO> updatePatient(final @PathVariable("patientId") UUID patientId,
                                                     final @Valid @RequestBody NewPatientRequest request) {
-        PatientDTO updatedPatient = patientService.updatePatient(request, id);
+        PatientDTO updatedPatient = patientService.updatePatient(request, patientId);
         return ResponseEntity.ok(updatedPatient);
     }
 
-    @DeleteMapping(path = "/{patientID}")
-    public ResponseEntity<String> deletePatient(final @PathVariable("patientID") UUID patientId) {
+    @DeleteMapping(path = "/{patientId}")
+    public ResponseEntity<String> deletePatient(final @PathVariable("patientId") UUID patientId) {
         patientService.deletePatient(patientId);
         return ResponseEntity.ok(PATIENT_REMOVE_SUCCESS_MSG);
     }
