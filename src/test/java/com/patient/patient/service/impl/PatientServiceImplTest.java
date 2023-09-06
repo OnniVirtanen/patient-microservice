@@ -17,6 +17,8 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import javax.swing.text.html.Option;
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Optional;
@@ -53,6 +55,7 @@ class PatientServiceImplTest {
     void canGetPatientById() {
         //given
         UUID patientId = UUID.randomUUID();
+        when(patientRepository.findById(patientId)).thenReturn(Optional.of(new PatientEntity()));
 
         // when
         patientService.getPatientById(patientId);
@@ -109,8 +112,7 @@ class PatientServiceImplTest {
     void canDeletePatient() throws PatientServiceException {
         // given
         UUID patientId = UUID.randomUUID();
-        PatientEntity patient = new PatientEntity();
-        when(patientRepository.findById(patientId)).thenReturn(Optional.of(patient));
+        when(patientRepository.existsById(patientId)).thenReturn(true);
 
         // when
         patientService.deletePatient(patientId);

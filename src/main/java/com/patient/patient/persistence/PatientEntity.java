@@ -107,14 +107,13 @@ public class PatientEntity {
         this.emergencyContactEntities = emergencyContactEntities;
     }
 
-    public static PatientEntity modifyPatient(final NewPatientRequest newPatient, final PatientEntity patientFromDB) {
-        patientFromDB.setFirstName(newPatient.firstName());
-        patientFromDB.setLastName(newPatient.secondName());
-        patientFromDB.setSecondName(newPatient.lastName());
-        patientFromDB.setGender(newPatient.gender());
-        patientFromDB.setSSN(newPatient.SSN());
-        patientFromDB.setDateOfBirth(newPatient.dateOfBirth());
-        return patientFromDB;
+    public void modifyPatient(final NewPatientRequest newPatient) {
+        setFirstName(newPatient.firstName());
+        setLastName(newPatient.secondName());
+        setSecondName(newPatient.lastName());
+        setGender(newPatient.gender());
+        setSSN(newPatient.SSN());
+        setDateOfBirth(newPatient.dateOfBirth());
     }
 
     public UUID getId() {

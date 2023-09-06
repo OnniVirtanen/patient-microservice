@@ -17,7 +17,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import static com.patient.patient.model.Constants.*;
+import static com.patient.patient.model.ErrorMessage.*;
 
 @Service
 public class PatientServiceImpl implements PatientService {
@@ -32,64 +32,81 @@ public class PatientServiceImpl implements PatientService {
 
     @Override
     public List<PatientDTO> getAllPatients() {
+        return getAllPatientsOrThrow();
+    }
+
+    @Override
+    @Transactional
+    public PatientDTO createPatient(final NewPatientRequest newPatientRequest) {
+        ensurePatientDoesNotExistBySSN(newPatientRequest.SSN());
+        PatientEntity newPatient = new PatientEntity(newPatientRequest);
+        return savePatientOrThrow(newPatient);
+    }
+
+    @Override
+    @Transactional
+    public PatientDTO updatePatient(final NewPatientRequest newPatientRequest, final UUID patientId) {
+        PatientEntity patient = getPatientByIdOrThrow(patientId);
+        patient.modifyPatient(newPatientRequest);
+        return savePatientOrThrow(patient);
+    }
+
+    @Override
+    @Transactional
+    public void deletePatient(final UUID patientId) {
+        ensurePatientIsPresent(patientId);
+        deletePatientOrThrow(patientId);
+    }
+
+    @Override
+    public PatientDTO getPatientById(final UUID patientId) {
+        PatientEntity patientFromDB = getPatientByIdOrThrow(patientId);
+        return patientDTOMapper.apply(patientFromDB);
+    }
+
+    private void deletePatientOrThrow(final UUID patientId) {
+        try {
+            patientRepository.deleteById(patientId);
+        } catch (Exception exception) {
+            throw new PatientServiceException(DELETE_PATIENT_ERR_MSG.getMessage(), exception);
+        }
+    }
+
+    private void ensurePatientIsPresent(final UUID patientId) {
+        boolean isPatientPresent = patientRepository.existsById(patientId);
+        if (!isPatientPresent) {
+            throw new PatientNotFoundException(NO_PATIENT_FOUND_ERR_MSG.getMessage());
+        }
+    }
+
+    private void ensurePatientDoesNotExistBySSN(final String ssn) {
+        if (patientRepository.existsBySSN(ssn)) {
+            throw new PatientAlreadyExistsException(PATIENT_ALREADY_EXISTS_ERR_MSG.getMessage());
+        }
+    }
+
+    private PatientEntity getPatientByIdOrThrow(final UUID patientId) {
+        Optional<PatientEntity> patientFromDB = patientRepository.findById(patientId);
+        return patientFromDB.orElseThrow(() -> new PatientNotFoundException(NO_PATIENT_FOUND_ERR_MSG.getMessage()));
+    }
+
+    private PatientDTO savePatientOrThrow(final PatientEntity patient) {
+        try {
+            PatientEntity savedPatient = patientRepository.save(patient);
+            return patientDTOMapper.apply(savedPatient);
+        } catch (Exception exception) {
+            throw new PatientServiceException(SAVE_PATIENT_ERR_MSG.getMessage(), exception);
+        }
+    }
+
+    private List<PatientDTO> getAllPatientsOrThrow() {
         try {
             return patientRepository.findAll()
                     .stream()
                     .map(patientDTOMapper)
                     .collect(Collectors.toList());
         } catch (Exception exception) {
-            throw new PatientServiceException(GET_ALL_PATIENTS_ERR_MSG, exception);
-        }
-    }
-
-    @Override
-    @Transactional
-    public PatientDTO createPatient(final NewPatientRequest newPatient) {
-        ensurePatientDoesNotExist(newPatient.SSN());
-        try {
-            PatientEntity savedPatient = patientRepository.save(new PatientEntity(newPatient));
-            return patientDTOMapper.apply(savedPatient);
-        } catch (Exception exception) {
-            throw new PatientServiceException(CREATE_PATIENT_ERR_MSG, exception);
-        }
-    }
-
-    @Override
-    @Transactional
-    public PatientDTO updatePatient(final NewPatientRequest newPatientRequest, final UUID patientId) {
-        Optional<PatientEntity> patientFromDB = patientRepository.findById(patientId);
-        patientFromDB.orElseThrow(() -> new PatientNotFoundException(NO_PATIENT_FOUND_ERR_MSG));
-        try {
-            PatientEntity patient = PatientEntity.modifyPatient(newPatientRequest, patientFromDB.get());
-            PatientEntity updatedPatient = patientRepository.save(patient);
-            return patientDTOMapper.apply(updatedPatient);
-        } catch (Exception exception) {
-            throw new PatientServiceException(UPDATE_PATIENT_ERR_MSG, exception);
-        }
-    }
-
-    @Override
-    @Transactional
-    public void deletePatient(final UUID patientId) {
-        Optional<PatientEntity> patientFromDB = patientRepository.findById(patientId);
-        patientFromDB.orElseThrow(() -> new PatientNotFoundException(NO_PATIENT_FOUND_ERR_MSG));
-        try {
-            patientRepository.deleteById(patientId);
-        } catch (Exception exception) {
-            throw new PatientServiceException(DELETE_PATIENT_ERR_MSG, exception);
-        }
-    }
-
-    @Override
-    public PatientDTO getPatientById(final UUID patientId) {
-        Optional<PatientEntity> patientFromDB = patientRepository.findById(patientId);
-        patientFromDB.orElseThrow(() -> new PatientNotFoundException(NO_PATIENT_FOUND_ERR_MSG));
-        return patientDTOMapper.apply(patientFromDB.get());
-    }
-
-    private void ensurePatientDoesNotExist(final String ssn) {
-        if (patientRepository.existsBySSN(ssn)) {
-            throw new PatientAlreadyExistsException(PATIENT_ALREADY_EXISTS_ERR_MSG);
+            throw new PatientServiceException(GET_ALL_PATIENTS_ERR_MSG.getMessage(), exception);
         }
     }
 }
