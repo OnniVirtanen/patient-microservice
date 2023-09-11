@@ -44,12 +44,12 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(PatientNotFoundException.class)
     public ResponseEntity<String> handlePatientNotFoundException(PatientNotFoundException exception) {
         logger.error(exception.getMessage(), exception);
-        return new ResponseEntity<>("Patient not found", HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(exception.getMessage(), HttpStatus.NOT_FOUND);
     }
 
-    @ExceptionHandler(RuntimeException.class)
-    public ResponseEntity<Object> handleRuntimeException(RuntimeException exception) {
+    @ExceptionHandler(PatientAlreadyExistsException.class)
+    public ResponseEntity<String> handlePatientAlreadyExistsException(PatientAlreadyExistsException exception) {
         logger.error(exception.getMessage(), exception);
-        return new ResponseEntity<>(exception.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        return new ResponseEntity<>(exception.getMessage(), HttpStatus.CONFLICT);
     }
 }
