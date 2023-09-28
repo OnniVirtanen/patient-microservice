@@ -1,6 +1,5 @@
 package com.patient.patient.model;
 
-import com.patient.patient.domain.PatientEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.function.Function;

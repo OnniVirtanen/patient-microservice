@@ -1,7 +1,7 @@
 package com.patient.patient.persistence;
 
-import com.patient.patient.domain.PatientEntity;
 import com.patient.patient.model.GenderEnum;
+import com.patient.patient.persistence.repository.PatientRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
