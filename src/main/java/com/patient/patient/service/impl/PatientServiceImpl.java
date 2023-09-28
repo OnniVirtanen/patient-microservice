@@ -6,7 +6,7 @@ import com.patient.patient.exception.PatientNotFoundException;
 import com.patient.patient.model.NewPatientRequest;
 import com.patient.patient.model.PatientDTO;
 import com.patient.patient.model.PatientDTOMapper;
-import com.patient.patient.persistence.PatientEntity;
+import com.patient.patient.domain.PatientEntity;
 import com.patient.patient.persistence.PatientRepository;
 import com.patient.patient.service.PatientService;
 import jakarta.transaction.Transactional;

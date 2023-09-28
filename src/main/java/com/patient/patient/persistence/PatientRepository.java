@@ -1,5 +1,6 @@
 package com.patient.patient.persistence;
 
+import com.patient.patient.domain.PatientEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;

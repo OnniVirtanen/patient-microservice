@@ -1,4 +1,4 @@
-package com.patient.patient.persistence;
+package com.patient.patient.domain;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

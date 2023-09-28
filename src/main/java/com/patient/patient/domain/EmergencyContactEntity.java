@@ -1,4 +1,4 @@
-package com.patient.patient.persistence;
+package com.patient.patient.domain;
 
 import com.patient.patient.model.RelationshipEnum;
 import jakarta.persistence.Column;
