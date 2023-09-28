@@ -1,4 +1,7 @@
 package com.patient.patient.domain.patient;
 
-public class Patient {
+import com.patient.patient.domain.person.Person;
+
+public class Patient extends Person {
+
 }

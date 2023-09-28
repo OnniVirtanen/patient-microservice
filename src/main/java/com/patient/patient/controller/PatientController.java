@@ -1,7 +1,6 @@
 package com.patient.patient.controller;
 
 import com.patient.patient.model.NewPatientRequest;
-import com.patient.patient.model.PatientDTO;
 import com.patient.patient.service.PatientService;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;

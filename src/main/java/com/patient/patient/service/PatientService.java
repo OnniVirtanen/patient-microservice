@@ -1,7 +1,6 @@
 package com.patient.patient.service;
 
 import com.patient.patient.model.NewPatientRequest;
-import com.patient.patient.model.PatientDTO;
 
 import java.util.List;
 import java.util.UUID;

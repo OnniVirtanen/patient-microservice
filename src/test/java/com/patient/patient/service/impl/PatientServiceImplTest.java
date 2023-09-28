@@ -3,8 +3,6 @@ package com.patient.patient.service.impl;
 import com.patient.patient.exception.PatientServiceException;
 import com.patient.patient.model.GenderEnum;
 import com.patient.patient.model.NewPatientRequest;
-import com.patient.patient.model.PatientDTO;
-import com.patient.patient.model.PatientDTOMapper;
 import com.patient.patient.persistence.repository.PatientRepository;
 import com.patient.patient.service.PatientService;
 import org.junit.jupiter.api.BeforeEach;
